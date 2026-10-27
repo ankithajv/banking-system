@@ -1,0 +1,42 @@
+{
+  "name": "unique-bank",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UNIQUE Bank — A modern banking UI demo built with React, Vite, and Tailwind CSS.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yashaswinimullalli/banking-system.git"
+  },
+  "keywords": [
+    "react",
+    "vite",
+    "tailwindcss",
+    "banking",
+    "demo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yashaswinimullalli/banking-system/issues"
+  },
+  "homepage": "https://github.com/yashaswinimullalli/banking-system#readme",
+  "dependencies": {
+    "framer-motion": "^14.7.1",
+    "lucide-react": "^1.62.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.5"
+  }
+}
