@@ -4,7 +4,10 @@ import Header from '../components/dashboard/Header';
 import Sidebar from '../components/dashboard/Sidebar';
 import AccountBalanceCard from '../components/dashboard/AccountBalanceCard';
 import CurrencyConverter from '../components/dashboard/CurrencyConverter';
-import PaymentMethods from '../components/dashboard/PaymentMethods';
+import QuickActions from '../components/dashboard/QuickActions';
+import SpendingOverview from '../components/dashboard/SpendingOverview';
+import UpcomingPayments from '../components/dashboard/UpcomingPayments';
+import SavingsGoals from '../components/dashboard/SavingsGoals';
 import RecentTransactions from '../components/dashboard/RecentTransactions';
 import PlansBannerCarousel from '../components/dashboard/PlansBannerCarousel';
 import ServiceViews from '../components/dashboard/ServiceViews';
@@ -61,8 +64,8 @@ export default function DashboardPage() {
       setError('Please enter a valid transfer amount.');
       return;
     }
-    if (num > balance) {
-      setError(`Insufficient balance. Current available: ₹${balance.toLocaleString('en-IN')}`);
+    if (num > (balance ?? 248350.75)) {
+      setError(`Insufficient balance. Current available: ₹${(balance ?? 248350.75).toLocaleString('en-IN')}`);
       return;
     }
 
@@ -97,9 +100,11 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-surface-alt">
+      {/* Top Navbar */}
       <Header />
 
       <div className="flex flex-1">
+        {/* Collapsible Sidebar */}
         <Sidebar
           activeItem={activeNav}
           onItemClick={setActiveNav}
@@ -107,58 +112,64 @@ export default function DashboardPage() {
           onMobileClose={() => setSidebarOpen(false)}
         />
 
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          {/* Featured Plans Carousel — below navigation, rotating every 2 seconds */}
+        {/* Main Dashboard Workspace */}
+        <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+          {/* Featured Plans Carousel strip */}
           <PlansBannerCarousel />
 
-          {/* Mobile menu toggle + greeting */}
-          <div className="mb-6 flex items-center justify-between">
+          {/* Greeting Header & Quick New Transaction Action */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
-                className="rounded-lg p-2 text-text-secondary hover:bg-gray-100 lg:hidden cursor-pointer"
+                className="rounded-xl p-2 text-text-secondary hover:bg-slate-100 lg:hidden cursor-pointer"
                 onClick={() => setSidebarOpen(true)}
-                aria-label="Open sidebar"
+                aria-label="Open sidebar menu"
               >
                 <Menu size={20} />
               </button>
 
               <div>
-                <h1 className="text-xl font-bold text-text-primary sm:text-2xl">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-text-primary tracking-tight">
                   Hello, {displayName}!
                 </h1>
-                <p className="text-sm text-text-secondary">
-                  Welcome back — here's your account overview.
+                <p className="text-xs sm:text-sm text-text-muted mt-0.5">
+                  Welcome back — here is your financial overview and daily activity.
                 </p>
               </div>
             </div>
-
-            <button
-              onClick={handleOpenNewTx}
-              className="btn-primary inline-flex cursor-pointer"
-            >
-              <PlusCircle size={18} />
-              New Transaction
-            </button>
           </div>
 
           {/* Content Switching based on Sidebar Navigation */}
           {activeNav === 'overview' ? (
-            <>
-              {/* Dashboard grid */}
-              <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            /* ── Balanced Two-Column Grid Layout matching Reference Design ── */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Main Left Column (7 cols on lg, 8 cols on xl) */}
+              <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+                {/* 1. Existing Redesigned Savings Account Card */}
                 <AccountBalanceCard />
-                <CurrencyConverter />
-              </div>
 
-              <div className="mt-6">
-                <PaymentMethods />
-              </div>
+                {/* 2. Quick Actions (Send Money, Mobile, Credit Card, Pay Bills) */}
+                <QuickActions />
 
-              <div className="mt-6">
+                {/* 3. Spending Overview (Category Donut + Monthly Bar Comparison) */}
+                <SpendingOverview />
+
+                {/* 4. Recent Activity (Search, Category Filters, CSV Export & Receipts) */}
                 <RecentTransactions />
               </div>
-            </>
+
+              {/* Right Side Column (5 cols on lg, 4 cols on xl) */}
+              <div className="lg:col-span-5 xl:col-span-4 space-y-6">
+                {/* 1. Currency Converter */}
+                <CurrencyConverter />
+
+                {/* 2. Upcoming Payments (BESCOM, Airtel, JioFiber with Demo Pay) */}
+                <UpcomingPayments />
+
+                {/* 3. Savings Goals (Target progress, percentages) */}
+                <SavingsGoals />
+              </div>
+            </div>
           ) : (
             <ServiceViews
               activeNav={activeNav}
@@ -167,9 +178,11 @@ export default function DashboardPage() {
           )}
 
           {/* Footer note */}
-          <p className="mt-8 text-center text-xs text-text-muted">
-            This is a frontend demonstration. No real banking transactions are performed.
-          </p>
+          <footer className="mt-10 border-t border-border/60 pt-6 pb-4 text-center text-xs text-text-muted">
+            <p>
+              UNIQUE Bank © 2026 · Demonstrative Banking Frontend Interface. All financial figures are simulated.
+            </p>
+          </footer>
         </main>
       </div>
 
@@ -195,7 +208,7 @@ export default function DashboardPage() {
 
               <button
                 onClick={handleCloseNewTx}
-                className="rounded-lg p-1.5 text-text-muted hover:bg-gray-100"
+                className="rounded-lg p-1.5 text-text-muted hover:bg-gray-100 cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -245,132 +258,132 @@ export default function DashboardPage() {
               </div>
             ) : (
               <form onSubmit={handleCreateTransaction} className="mt-4 space-y-4">
-              {error && (
-                <div className="rounded-xl bg-red-50 p-3 text-xs text-red-600 font-semibold border border-red-200">
-                  {error}
-                </div>
-              )}
-
-              <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1">
-                  Recipient Name / Payee
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Ramesh Kumar or Swiggy"
-                  value={recipient}
-                  onChange={(e) => setRecipient(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-white px-3.5 py-2 text-sm text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-text-secondary mb-1">
-                    Channel
-                  </label>
-                  <select
-                    value={method}
-                    onChange={(e) => setMethod(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-white px-3 py-2 text-xs sm:text-sm text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                  >
-                    <option value="UPI Transfer">UPI Transfer</option>
-                    <option value="IMPS / NEFT">IMPS / NEFT</option>
-                    <option value="Debit Card">Debit Card</option>
-                    <option value="Net Banking">Net Banking</option>
-                  </select>
-                </div>
+                {error && (
+                  <div className="rounded-xl bg-red-50 p-3 text-xs text-red-600 font-semibold border border-red-200">
+                    {error}
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-xs font-semibold text-text-secondary mb-1">
-                    Category
+                    Recipient Name / Payee
                   </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-white px-3 py-2 text-xs sm:text-sm text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                  >
-                    <option value="transfer">Transfer</option>
-                    <option value="shopping">Shopping</option>
-                    <option value="utilities">Bills & Utilities</option>
-                    <option value="income">Income</option>
-                    <option value="rewards">Rewards</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="text-xs font-semibold text-text-secondary">
-                    Amount (INR)
-                  </label>
-                  <span className="text-[11px] text-text-muted">
-                    Available: ₹{balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-text-muted">
-                    ₹
-                  </span>
                   <input
-                    type="number"
-                    min="1"
-                    step="any"
-                    placeholder="0.00"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-white pl-8 pr-4 py-2 text-sm font-bold text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    type="text"
+                    placeholder="e.g. Ramesh Kumar or Swiggy"
+                    value={recipient}
+                    onChange={(e) => setRecipient(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-white px-3.5 py-2 text-sm text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                     required
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1">
-                  Note / Purpose (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Month end settlement"
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-white px-3.5 py-2 text-sm text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                />
-              </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-text-secondary mb-1">
+                      Channel
+                    </label>
+                    <select
+                      value={method}
+                      onChange={(e) => setMethod(e.target.value)}
+                      className="w-full rounded-xl border border-border bg-white px-3 py-2 text-xs sm:text-sm text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    >
+                      <option value="UPI Transfer">UPI Transfer</option>
+                      <option value="IMPS / NEFT">IMPS / NEFT</option>
+                      <option value="Debit Card">Debit Card</option>
+                      <option value="Net Banking">Net Banking</option>
+                    </select>
+                  </div>
 
-              <div className="pt-2 flex items-center justify-end gap-3 border-t border-border">
-                <button
-                  type="button"
-                  onClick={() => setNewTxModalOpen(false)}
-                  className="rounded-xl px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-gray-100"
-                >
-                  Cancel
-                </button>
+                  <div>
+                    <label className="block text-xs font-semibold text-text-secondary mb-1">
+                      Category
+                    </label>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full rounded-xl border border-border bg-white px-3 py-2 text-xs sm:text-sm text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    >
+                      <option value="transfer">Transfer</option>
+                      <option value="shopping">Shopping</option>
+                      <option value="utilities">Bills & Utilities</option>
+                      <option value="income">Income</option>
+                      <option value="rewards">Rewards</option>
+                    </select>
+                  </div>
+                </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2 text-xs sm:text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-50 transition-all shadow-sm"
-                >
-                  {loading ? (
-                    <>
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                      <span>Processing…</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Send Payment</span>
-                      <ArrowRight size={15} />
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          )}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-xs font-semibold text-text-secondary">
+                      Amount (INR)
+                    </label>
+                    <span className="text-[11px] text-text-muted">
+                      Available: ₹{(balance ?? 248350.75).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-text-muted">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      step="any"
+                      placeholder="0.00"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="w-full rounded-xl border border-border bg-white pl-8 pr-4 py-2 text-sm font-bold text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">
+                    Note / Purpose (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Month end settlement"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-white px-3.5 py-2 text-sm text-text-primary focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-3 border-t border-border">
+                  <button
+                    type="button"
+                    onClick={() => setNewTxModalOpen(false)}
+                    className="rounded-xl px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-gray-100 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2 text-xs sm:text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-50 transition-all shadow-sm cursor-pointer"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                        <span>Processing…</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Send Payment</span>
+                        <ArrowRight size={15} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
       {/* PIN Verification Modal */}
       <PinVerificationModal

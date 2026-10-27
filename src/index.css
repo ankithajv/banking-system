@@ -1,15 +1,27 @@
 @import "tailwindcss";
 
+:root {
+  --color-primary: #7043C6;
+  --color-primary-light: #F2ECFF;
+  --color-text: #202B3C;
+  --color-muted: #98A2B3;
+  --color-background: #F7F8FA;
+  --color-surface: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-success: #07865B;
+  --color-danger: #DC3545;
+}
+
 /* ── Design tokens via Tailwind v4 @theme ─────────────────────────── */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand-50: #f3eeff;
+  --color-brand-50: #f2ecff;
   --color-brand-100: #e4d9ff;
   --color-brand-200: #cbb5ff;
   --color-brand-300: #a985ff;
   --color-brand-400: #8b5cf6;
-  --color-brand-500: #6c3fc5;
+  --color-brand-500: #7043c6;
   --color-brand-600: #5b2da8;
   --color-brand-700: #4a2389;
   --color-brand-800: #3b1c6e;
@@ -17,20 +29,20 @@
 
   --color-success-50: #ecfdf5;
   --color-success-100: #d1fae5;
-  --color-success-500: #10b981;
-  --color-success-600: #059669;
-  --color-success-700: #047857;
+  --color-success-500: #07865b;
+  --color-success-600: #05704c;
+  --color-success-700: #045a3d;
 
   --color-danger-50: #fef2f2;
-  --color-danger-500: #ef4444;
-  --color-danger-600: #dc2626;
+  --color-danger-500: #dc3545;
+  --color-danger-600: #b82333;
 
   --color-surface: #ffffff;
-  --color-surface-alt: #f8f9fb;
+  --color-surface-alt: #f7f8fa;
   --color-border: #e5e7eb;
-  --color-text-primary: #1f2937;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #9ca3af;
+  --color-text-primary: #202b3c;
+  --color-text-secondary: #64748b;
+  --color-text-muted: #98a2b3;
 }
 
 /* ── Base resets ──────────────────────────────────────────────────── */
