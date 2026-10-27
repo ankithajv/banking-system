@@ -13,7 +13,13 @@
     "type": "git",
     "url": "git+https://github.com/yashaswinimullalli/banking-system.git"
   },
-  "keywords": ["react", "vite", "tailwindcss", "banking", "demo"],
+  "keywords": [
+    "react",
+    "vite",
+    "tailwindcss",
+    "banking",
+    "demo"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
@@ -21,6 +27,7 @@
   },
   "homepage": "https://github.com/yashaswinimullalli/banking-system#readme",
   "dependencies": {
+    "framer-motion": "^14.7.1",
     "lucide-react": "^1.62.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

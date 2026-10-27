@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
 import InputField from '../common/InputField';
 import Button from '../common/Button';
@@ -75,9 +75,32 @@ export default function SignupForm() {
 
     if (Object.keys(newErrors).length > 0) return;
 
+    // Persist registered user to localStorage so they can login next time
+    try {
+      const storedUsers = JSON.parse(localStorage.getItem('unique_bank_users') || '[]');
+      const newUser = {
+        username: form.username.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        password: form.password,
+      };
+      const updated = [
+        ...storedUsers.filter(
+          (u) =>
+            u.username.toLowerCase() !== newUser.username.toLowerCase() &&
+            u.email.toLowerCase() !== newUser.email.toLowerCase()
+        ),
+        newUser,
+      ];
+      localStorage.setItem('unique_bank_users', JSON.stringify(updated));
+      localStorage.setItem('unique_bank_current_user', JSON.stringify(newUser));
+    } catch {
+      // ignore storage errors
+    }
+
     // Simulate API call
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((r) => setTimeout(r, 1000));
     setLoading(false);
     setSuccess(true);
 
@@ -179,7 +202,17 @@ export default function SignupForm() {
         </Button>
       </div>
 
-      <p className="mt-5 text-center text-xs text-text-muted">
+      <p className="mt-4 text-center text-sm text-text-secondary">
+        Already have an account?{' '}
+        <Link
+          to="/login"
+          className="font-semibold text-brand-600 hover:text-brand-700 hover:underline"
+        >
+          Log in
+        </Link>
+      </p>
+
+      <p className="mt-4 text-center text-xs text-text-muted">
         This is a frontend demonstration only. No data is stored or transmitted.
       </p>
     </form>

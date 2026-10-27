@@ -7,10 +7,15 @@ import AccountBalanceCard from '../components/dashboard/AccountBalanceCard';
 import CurrencyConverter from '../components/dashboard/CurrencyConverter';
 import PaymentMethods from '../components/dashboard/PaymentMethods';
 import RecentTransactions from '../components/dashboard/RecentTransactions';
+import PlansBannerCarousel from '../components/dashboard/PlansBannerCarousel';
+
+import { getUserGreetingName } from '../utils/user';
 
 export default function DashboardPage() {
   const [activeNav, setActiveNav] = useState('investments');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const displayName = getUserGreetingName();
 
   return (
     <div className="flex min-h-screen flex-col bg-surface-alt">
@@ -26,6 +31,9 @@ export default function DashboardPage() {
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          {/* Featured Plans Carousel — below navigation, rotating every 2 seconds */}
+          <PlansBannerCarousel />
+
           {/* Mobile menu toggle + greeting */}
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -39,7 +47,7 @@ export default function DashboardPage() {
 
               <div>
                 <h1 className="text-xl font-bold text-text-primary sm:text-2xl">
-                  Hello, {accountHolder.firstName}!
+                  Hello, {displayName}!
                 </h1>
                 <p className="text-sm text-text-secondary">
                   Welcome back — here's your account overview.
