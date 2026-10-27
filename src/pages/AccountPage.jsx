@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useBanking } from '../context/BankingContext';
 import {
   ArrowLeft,
   User,
@@ -29,13 +30,24 @@ import {
   ChevronRight,
   ShieldAlert,
   Sparkles,
+  QrCode,
+  RefreshCw,
 } from 'lucide-react';
 import Header from '../components/dashboard/Header';
+import { UpiLogo, SetupUpiModal, ChangeUpiIdModal, ChangeUpiPinModal, ViewUpiQrModal } from '../components/common/UpiModals';
 import { accountHolder } from '../data/mockData';
 import { formatPersonName, getSavingsAccountHolderName } from '../utils/user';
 
 export default function AccountPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { balance, showToast, upiId, upiPin } = useBanking();
+
+  // UPI Management Modal States
+  const [setupUpiModalOpen, setSetupUpiModalOpen] = useState(false);
+  const [changeUpiIdModalOpen, setChangeUpiIdModalOpen] = useState(false);
+  const [changeUpiPinModalOpen, setChangeUpiPinModalOpen] = useState(false);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
 
   // Load current user from localStorage or fall back to defaults
   const [user, setUser] = useState(() => {
@@ -77,7 +89,15 @@ export default function AccountPage() {
     };
   });
 
-  const [activeTab, setActiveTab] = useState('profile');
+  const tabFromQuery = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromQuery || 'profile');
+
+  useEffect(() => {
+    if (tabFromQuery) {
+      setActiveTab(tabFromQuery);
+    }
+  }, [tabFromQuery]);
+
   const [copiedField, setCopiedField] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [cardFrozen, setCardFrozen] = useState(false);
@@ -132,9 +152,58 @@ export default function AccountPage() {
       setPassMsg({ type: 'error', text: 'New password and confirmation do not match.' });
       return;
     }
-    setPassMsg({ type: 'success', text: 'Password successfully updated!' });
+    showToast('Password successfully updated!', 'success');
     setPasswords({ current: '', newPass: '', confirm: '' });
     setTimeout(() => setPassMsg({ type: '', text: '' }), 4000);
+  };
+
+  const handleDownloadPdfStatement = () => {
+    const text = `================================================
+          UNIQUE BANK - ACCOUNT STATEMENT
+================================================
+Account Holder : ${user.firstName} ${user.lastName}
+Account Number : 1024 8839 4523
+IFSC Code      : UNIQ0004523
+Branch         : Koramangala Tech Hub, Bengaluru
+Current Balance: INR ${balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+Generated On   : ${new Date().toLocaleDateString('en-GB')}
+Status         : KYC VERIFIED & ACTIVE
+================================================
+OFFICIAL CERTIFIED DIGITAL STATEMENT
+================================================`;
+    const blob = new Blob([text], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `statement-${new Date().toISOString().slice(0, 7)}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Official Statement PDF downloaded successfully!', 'success');
+  };
+
+  const handleDownloadExcelStatement = () => {
+    const csv = `Date,Description,Reference ID,Type,Amount (INR),Balance
+2026-10-25,Salary Credit — October 2026,TXN948201824,Credit,85000.00,${balance}
+2026-10-24,Amazon.in Purchase,TXN948201825,Debit,-2499.00,${balance - 85000}
+2026-10-22,Electricity Bill — BESCOM,TXN948201826,Debit,-1350.00,${balance - 85000 + 2499}
+2026-10-20,UPI Transfer — Ravi Kumar,TXN948201827,Debit,-5000.00,${balance - 85000 + 3849}
+`;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `statement-${new Date().toISOString().slice(0, 7)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Spreadsheet Statement (CSV) downloaded successfully!', 'success');
+  };
+
+  const handleTerminateSessions = () => {
+    showToast('All other active device sessions have been terminated.', 'success');
   };
 
   const handleLogout = () => {
@@ -266,7 +335,7 @@ export default function AccountPage() {
                   Total Available Balance
                 </p>
                 <p className="mt-1 text-lg font-extrabold text-brand-700 tracking-tight">
-                  ₹ 2,48,350.75
+                  ₹ {balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -281,8 +350,11 @@ export default function AccountPage() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 ${isActive
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setSearchParams({ tab: tab.id });
+                }}
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${isActive
                   ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/25'
                   : 'bg-white/80 text-text-secondary hover:bg-white hover:text-text-primary border border-border/70 shadow-2xs'
                   }`}
@@ -562,23 +634,124 @@ export default function AccountPage() {
                   <div className="flex items-center justify-between py-3">
                     <span className="text-text-muted">Registered UPI ID</span>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold text-brand-600">
-                        {user.username || 'yashaswini'}@uniquebank
-                      </span>
-                      <button
-                        onClick={() => copyToClipboard(`${user.username || 'yashaswini'}@uniquebank`, 'upi')}
-                        className="text-text-muted hover:text-brand-600"
-                        title="Copy"
-                      >
-                        {copiedField === 'upi' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                      </button>
+                      {upiId ? (
+                        <>
+                          <span className="font-mono font-semibold text-brand-600">
+                            {upiId}
+                          </span>
+                          <button
+                            onClick={() => copyToClipboard(upiId, 'upi')}
+                            className="text-text-muted hover:text-brand-600 cursor-pointer"
+                            title="Copy"
+                          >
+                            {copiedField === 'upi' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                          </button>
+                          <button
+                            onClick={() => setChangeUpiIdModalOpen(true)}
+                            className="text-xs text-brand-600 hover:underline font-semibold ml-1 cursor-pointer"
+                          >
+                            Change
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => setSetupUpiModalOpen(true)}
+                          className="text-xs font-bold text-brand-600 hover:underline cursor-pointer"
+                        >
+                          Set Up UPI →
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Limits and Statements */}
+              {/* Limits, UPI Management and Statements */}
               <div className="space-y-6">
+                {/* ── UPI & Digital Banking Card ── */}
+                <div className="rounded-2xl border border-white/60 bg-white/85 p-5 sm:p-7 shadow-sm backdrop-blur-md">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2.5">
+                      <UpiLogo className="h-6 w-auto" />
+                      <div>
+                        <h3 className="text-base font-bold text-text-primary">UPI & Instant Transfers</h3>
+                        <p className="text-[11px] text-text-muted">Virtual Payment Address & PIN Management</p>
+                      </div>
+                    </div>
+                    {upiId ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        Active
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200/60">
+                        Not Configured
+                      </span>
+                    )}
+                  </div>
+
+                  {upiId ? (
+                    <div className="space-y-4">
+                      <div className="rounded-xl bg-surface-alt p-3.5 border border-border/70 flex items-center justify-between">
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-text-muted tracking-wider block">
+                            Active UPI ID
+                          </span>
+                          <span className="font-mono text-base font-bold text-brand-600">{upiId}</span>
+                          <p className="text-[11px] text-text-muted mt-0.5">Linked to Savings A/C (•••• 4523)</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => copyToClipboard(upiId, 'upi-card')}
+                            className="rounded-lg border border-border/80 bg-white p-2 text-text-secondary hover:text-brand-600 shadow-2xs cursor-pointer"
+                            title="Copy UPI ID"
+                          >
+                            {copiedField === 'upi-card' ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+                          </button>
+                          <button
+                            onClick={() => setQrModalOpen(true)}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-white px-3 py-2 text-xs font-semibold text-text-primary hover:bg-gray-50 shadow-2xs cursor-pointer"
+                          >
+                            <QrCode size={15} className="text-brand-600" />
+                            <span>QR Code</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <button
+                          onClick={() => setChangeUpiIdModalOpen(true)}
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 bg-brand-50/70 px-4 py-2.5 text-xs font-bold text-brand-700 hover:bg-brand-100 transition-colors cursor-pointer"
+                        >
+                          <RefreshCw size={14} />
+                          <span>Change UPI ID</span>
+                        </button>
+
+                        <button
+                          onClick={() => setChangeUpiPinModalOpen(true)}
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-4 py-2.5 text-xs font-bold text-text-primary hover:bg-gray-50 transition-colors shadow-2xs cursor-pointer"
+                        >
+                          <Lock size={14} className="text-brand-600" />
+                          <span>Change UPI PIN</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-dashed border-brand-300 bg-brand-50/40 p-5 text-center space-y-3">
+                      <p className="text-xs text-text-secondary leading-relaxed max-w-sm mx-auto">
+                        You have not set up your UNIQUE Bank UPI ID yet. Activate it in seconds to send and receive payments 24/7.
+                      </p>
+                      <button
+                        onClick={() => setSetupUpiModalOpen(true)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-brand-700 transition-all shadow-sm cursor-pointer"
+                      >
+                        <Sparkles size={15} />
+                        <span>Set Up UPI ID Now</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 {/* Transfer Limits */}
                 <div className="rounded-2xl border border-white/60 bg-white/85 p-5 sm:p-7 shadow-sm backdrop-blur-md">
                   <h3 className="text-base font-bold text-text-primary mb-4">Transfer & Payment Limits</h3>
@@ -617,16 +790,16 @@ export default function AccountPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
-                      onClick={() => alert('Downloading official statement (PDF)...')}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-3.5 py-2.5 text-xs font-semibold text-text-primary hover:bg-gray-50 transition-colors shadow-2xs"
+                      onClick={handleDownloadPdfStatement}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-3.5 py-2.5 text-xs font-semibold text-text-primary hover:bg-gray-50 transition-colors shadow-2xs cursor-pointer"
                     >
                       <Download size={15} className="text-brand-600" />
                       <span>Download PDF</span>
                     </button>
 
                     <button
-                      onClick={() => alert('Downloading spreadsheet statement (Excel)...')}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-3.5 py-2.5 text-xs font-semibold text-text-primary hover:bg-gray-50 transition-colors shadow-2xs"
+                      onClick={handleDownloadExcelStatement}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-3.5 py-2.5 text-xs font-semibold text-text-primary hover:bg-gray-50 transition-colors shadow-2xs cursor-pointer"
                     >
                       <Download size={15} className="text-emerald-600" />
                       <span>Download Excel</span>
@@ -775,8 +948,8 @@ export default function AccountPage() {
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-base font-bold text-text-primary">Active Login Sessions</h3>
                     <button
-                      onClick={() => alert('All other sessions terminated.')}
-                      className="text-xs font-semibold text-red-600 hover:underline"
+                      onClick={handleTerminateSessions}
+                      className="text-xs font-semibold text-red-600 hover:underline cursor-pointer"
                     >
                       Sign Out All Others
                     </button>
@@ -854,7 +1027,11 @@ export default function AccountPage() {
                   {/* Chip & Contactless */}
                   <div className="mt-8 flex items-center justify-between">
                     <div className="h-8 w-11 rounded-md bg-amber-400/80 border border-amber-300 shadow-inner"></div>
-                    <span className="text-lg">📡</span>
+                    <svg className="h-6 w-6 text-white/80 rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-label="Contactless card">
+                      <path d="M4 19a16 16 0 0 1 16-16" />
+                      <path d="M4 14a11 11 0 0 1 11-11" />
+                      <path d="M4 9a6 6 0 0 1 6-6" />
+                    </svg>
                   </div>
 
                   {/* Card Number */}
@@ -1037,6 +1214,26 @@ export default function AccountPage() {
           )}
         </div>
       </main>
+
+      {/* ── UPI Management Modals ── */}
+      <SetupUpiModal
+        isOpen={setupUpiModalOpen}
+        onClose={() => setSetupUpiModalOpen(false)}
+        defaultHandle={user.username || user.firstName}
+      />
+      <ChangeUpiIdModal
+        isOpen={changeUpiIdModalOpen}
+        onClose={() => setChangeUpiIdModalOpen(false)}
+      />
+      <ChangeUpiPinModal
+        isOpen={changeUpiPinModalOpen}
+        onClose={() => setChangeUpiPinModalOpen(false)}
+      />
+      <ViewUpiQrModal
+        isOpen={qrModalOpen}
+        onClose={() => setQrModalOpen(false)}
+        upiId={upiId}
+      />
 
       {/* ── Footer ── */}
       <footer className="mt-12 border-t border-white/60 bg-white/70 backdrop-blur-md px-4 py-4 text-center text-xs text-text-secondary">

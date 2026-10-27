@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -101,18 +102,31 @@ export default function PlansBannerCarousel() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Foreground sharp uncropped banner image with subtle shadow */}
+        {/* Foreground sharp uncropped banner image with subtle shadow and click-to-explore link */}
         <AnimatePresence mode="wait">
-          <motion.img
+          <motion.div
             key={`img-${currentPlan.id}`}
-            src={currentPlan.image}
-            alt={currentPlan.alt}
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.35, ease: 'easeInOut' }}
-            className="relative z-10 h-full w-auto max-w-full object-contain select-none shadow-2xl rounded-xl"
-          />
+            className="relative z-10 h-full flex items-center justify-center"
+          >
+            <Link
+              to={`/plans?plan=${currentPlan.id}`}
+              className="relative block h-full select-none cursor-pointer group/plan"
+              title={`View ${currentPlan.title} details`}
+            >
+              <img
+                src={currentPlan.image}
+                alt={currentPlan.alt}
+                className="h-full w-auto max-w-full object-contain shadow-2xl rounded-xl transition-transform duration-300 group-hover/plan:scale-[1.01]"
+              />
+              <span className="absolute bottom-10 right-4 hidden sm:inline-flex items-center gap-1 rounded-full bg-brand-600/90 hover:bg-brand-600 text-white px-3 py-1 text-xs font-bold shadow-lg backdrop-blur-md transition-all opacity-0 group-hover:opacity-100">
+                Explore Plan →
+              </span>
+            </Link>
+          </motion.div>
         </AnimatePresence>
 
         {/* Previous / Next Arrow Controls */}

@@ -14,7 +14,7 @@ export default function NotFoundPage() {
         Oops — we couldn't find the page you're looking for.
       </p>
       <div className="mt-6 w-48">
-        <Button onClick={() => navigate('/signup')}>
+        <Button onClick={() => navigate('/dashboard')}>
           <Home size={18} />
           Go Home
         </Button>

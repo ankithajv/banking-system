@@ -66,7 +66,7 @@ export default function CurrencyConverter() {
           >
             {currencies.map((code) => (
               <option key={code} value={code}>
-                {exchangeRates[code].flag} {code} — {exchangeRates[code].name}
+                {code} — {exchangeRates[code].name}
               </option>
             ))}
           </select>
