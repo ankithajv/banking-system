@@ -8,7 +8,6 @@ import QuickActions from '../components/dashboard/QuickActions';
 import SpendingOverview from '../components/dashboard/SpendingOverview';
 import UpcomingPayments from '../components/dashboard/UpcomingPayments';
 import SavingsGoals from '../components/dashboard/SavingsGoals';
-import NotificationsPanel from '../components/dashboard/NotificationsPanel';
 import RecentTransactions from '../components/dashboard/RecentTransactions';
 import PlansBannerCarousel from '../components/dashboard/PlansBannerCarousel';
 import ServiceViews from '../components/dashboard/ServiceViews';
@@ -138,14 +137,6 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
-
-            <button
-              onClick={handleOpenNewTx}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand-600 hover:bg-brand-700 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all hover:shadow-md active:scale-98 cursor-pointer"
-            >
-              <PlusCircle size={18} />
-              <span>New Transaction</span>
-            </button>
           </div>
 
           {/* Content Switching based on Sidebar Navigation */}
@@ -177,9 +168,6 @@ export default function DashboardPage() {
 
                 {/* 3. Savings Goals (Target progress, percentages) */}
                 <SavingsGoals />
-
-                {/* 4. Notifications Panel */}
-                <NotificationsPanel />
               </div>
             </div>
           ) : (

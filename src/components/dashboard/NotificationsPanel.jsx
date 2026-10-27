@@ -101,11 +101,6 @@ export default function NotificationsPanel() {
         })}
       </div>
 
-      <div className="mt-3.5 pt-2 border-t border-border/60 text-center">
-        <button className="text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors">
-          View All Activity Notifications →
-        </button>
-      </div>
     </div>
   );
 }
