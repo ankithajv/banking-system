@@ -1,4 +1,5 @@
 import {
+  LayoutDashboard,
   TrendingUp,
   HandCoins,
   PiggyBank,
@@ -9,7 +10,13 @@ import {
 } from 'lucide-react';
 import { sidebarItems } from '../../data/mockData';
 
+const allNavItems = [
+  { key: 'overview', label: 'Dashboard' },
+  ...sidebarItems,
+];
+
 const iconMap = {
+  overview: LayoutDashboard,
   investments: TrendingUp,
   loans: HandCoins,
   deposits: PiggyBank,
@@ -26,9 +33,9 @@ export default function Sidebar({ activeItem, onItemClick, mobileOpen, onMobileC
   const navContent = (
     <nav className="flex flex-col gap-1 px-3 py-4">
       <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-text-muted">
-        Services
+        Navigation
       </p>
-      {sidebarItems.map((item) => {
+      {allNavItems.map((item) => {
         const Icon = iconMap[item.key] || Wrench;
         const isActive = activeItem === item.key;
         return (
@@ -38,9 +45,9 @@ export default function Sidebar({ activeItem, onItemClick, mobileOpen, onMobileC
               onItemClick(item.key);
               onMobileClose?.();
             }}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors cursor-pointer
               ${isActive
-                ? 'bg-brand-50 text-brand-600'
+                ? 'bg-brand-50 text-brand-600 font-semibold'
                 : 'text-text-secondary hover:bg-gray-100 hover:text-text-primary'
               }`}
           >

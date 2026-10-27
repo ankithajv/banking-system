@@ -121,10 +121,10 @@ export default function CurrencyConverter() {
                 text-text-primary outline-none transition-colors
                 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
             >
-              <option value="INR">🇮🇳 INR</option>
+              <option value="INR">INR — Indian Rupee</option>
               {foreignCurrencies.map((c) => (
                 <option key={`src-${c}`} value={c}>
-                  {exchangeRates[c].flag} {c}
+                  {c} — {exchangeRates[c]?.name || c}
                 </option>
               ))}
             </select>
@@ -163,10 +163,10 @@ export default function CurrencyConverter() {
                 text-text-primary outline-none transition-colors
                 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
             >
-              <option value="INR">🇮🇳 INR</option>
+              <option value="INR">INR — Indian Rupee</option>
               {foreignCurrencies.map((c) => (
                 <option key={`tgt-${c}`} value={c}>
-                  {exchangeRates[c].flag} {c}
+                  {c} — {exchangeRates[c]?.name || c}
                 </option>
               ))}
             </select>

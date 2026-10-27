@@ -50,7 +50,7 @@ function validate(form) {
 
 /**
  * Signup form with client-side validation.
- * ⚠️  This is a frontend demo — no data is persisted or sent to a server.
+ * NOTE: This is a frontend demo — no data is persisted or sent to a server.
  */
 export default function SignupForm() {
   const navigate = useNavigate();
@@ -123,7 +123,7 @@ export default function SignupForm() {
 
       {success && (
         <div className="mb-5 rounded-lg bg-success-50 px-4 py-3 text-center text-sm font-medium text-success-700">
-          🎉 Account created successfully! Redirecting to dashboard…
+          Account created successfully! Redirecting to dashboard…
         </div>
       )}
 

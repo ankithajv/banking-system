@@ -1,7 +1,7 @@
 /**
  * Mock data for UNIQUE Bank frontend demonstration.
  *
- * ⚠️  All data here is fictional and used solely for UI demonstration.
+ * NOTE: All data here is fictional and used solely for UI demonstration.
  *     Nothing represents real financial information or live exchange rates.
  */
 
@@ -19,14 +19,14 @@ export const accountHolder = {
  * These are NOT live market rates.
  */
 export const exchangeRates = {
-  USD: { rate: 0.012, symbol: '$', name: 'US Dollar', flag: '🇺🇸' },
-  EUR: { rate: 0.011, symbol: '€', name: 'Euro', flag: '🇪🇺' },
-  GBP: { rate: 0.0095, symbol: '£', name: 'British Pound', flag: '🇬🇧' },
-  JPY: { rate: 1.78, symbol: '¥', name: 'Japanese Yen', flag: '🇯🇵' },
-  AED: { rate: 0.044, symbol: 'د.إ', name: 'UAE Dirham', flag: '🇦🇪' },
-  CAD: { rate: 0.016, symbol: 'C$', name: 'Canadian Dollar', flag: '🇨🇦' },
-  AUD: { rate: 0.018, symbol: 'A$', name: 'Australian Dollar', flag: '🇦🇺' },
-  SGD: { rate: 0.016, symbol: 'S$', name: 'Singapore Dollar', flag: '🇸🇬' },
+  USD: { rate: 0.012, symbol: '$', name: 'US Dollar' },
+  EUR: { rate: 0.011, symbol: '€', name: 'Euro' },
+  GBP: { rate: 0.0095, symbol: '£', name: 'British Pound' },
+  JPY: { rate: 1.78, symbol: '¥', name: 'Japanese Yen' },
+  AED: { rate: 0.044, symbol: 'AED', name: 'UAE Dirham' },
+  CAD: { rate: 0.016, symbol: 'C$', name: 'Canadian Dollar' },
+  AUD: { rate: 0.018, symbol: 'A$', name: 'Australian Dollar' },
+  SGD: { rate: 0.016, symbol: 'S$', name: 'Singapore Dollar' },
 };
 
 export const recentTransactions = [

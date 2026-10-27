@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu,
@@ -11,6 +11,7 @@ import {
   FileText,
   CheckCircle2,
   Wallet,
+  CreditCard,
   Settings,
   Bell,
   Check,
@@ -19,12 +20,13 @@ import {
 } from 'lucide-react';
 import Logo from '../common/Logo';
 import { accountHolder, initialNotifications } from '../../data/mockData';
+import { useBanking } from '../../context/BankingContext';
 import { getSavingsAccountHolderName } from '../../utils/user';
 
 const navLinks = [
   { label: 'Banking', href: '/dashboard' },
-  { label: 'Lifestyle', href: '/dashboard' },
-  { label: 'Plans', href: '/dashboard' },
+  { label: 'Lifestyle', href: '/lifestyle' },
+  { label: 'Plans', href: '/plans' },
 ];
 
 export default function Header() {
@@ -36,6 +38,8 @@ export default function Header() {
   const menuRef = useRef(null);
   const notifRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { balance } = useBanking();
 
   // Retrieve current user info
   const currentUser = (() => {
@@ -97,16 +101,23 @@ export default function Header() {
         <Logo size="md" linkTo="/dashboard" />
 
         {/* Desktop nav links */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              to={link.href}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-text-secondary hover:bg-white/60 hover:text-brand-600 transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <nav className="hidden items-center gap-1.5 md:flex">
+          {navLinks.map((link) => {
+            const isActive = location.pathname === link.href;
+            return (
+              <Link
+                key={link.label}
+                to={link.href}
+                className={`rounded-xl px-4 py-2 text-sm transition-all ${
+                  isActive
+                    ? 'bg-white/80 text-brand-600 font-bold shadow-2xs'
+                    : 'font-medium text-text-secondary hover:bg-white/60 hover:text-brand-600'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right side controls: Notification Bell + My Account + Mobile toggle */}
@@ -250,7 +261,7 @@ export default function Header() {
                 >
                   {/* Account profile header -> links to /account */}
                   <Link
-                    to="/account"
+                    to="/account?tab=profile"
                     onClick={() => setAccountOpen(false)}
                     className="flex items-start gap-3 rounded-xl bg-surface-alt/70 p-3 border border-border/50 hover:bg-surface-alt transition-colors group"
                   >
@@ -274,10 +285,29 @@ export default function Header() {
                     </div>
                   </Link>
 
+                  {/* Account overview snippet with dynamic balance */}
+                  <div className="mt-2.5 rounded-xl border border-brand-100/80 bg-brand-50/40 p-2.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-text-muted flex items-center gap-1">
+                        <Wallet size={12} className="text-brand-500" />
+                        Savings A/C
+                      </span>
+                      <span className="font-semibold text-text-primary">
+                        {accountHolder.accountNumber}
+                      </span>
+                    </div>
+                    <div className="mt-1 flex items-center justify-between text-xs">
+                      <span className="text-text-muted">Balance</span>
+                      <span className="font-extrabold text-brand-600">
+                        ₹ {balance ? balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '2,48,350.75'}
+                      </span>
+                    </div>
+                  </div>
+
                   {/* Profile & Security Options */}
-                  <div className="mt-2 space-y-0.5 text-xs">
+                  <div className="mt-2.5 space-y-0.5 text-xs sm:text-sm">
                     <Link
-                      to="/account"
+                      to="/account?tab=profile"
                       onClick={() => setAccountOpen(false)}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-text-secondary hover:bg-brand-50 hover:text-brand-600 transition-colors text-left font-medium"
                     >
@@ -286,7 +316,7 @@ export default function Header() {
                     </Link>
 
                     <Link
-                      to="/account"
+                      to="/account?tab=security"
                       onClick={() => setAccountOpen(false)}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-text-secondary hover:bg-brand-50 hover:text-brand-600 transition-colors text-left font-medium"
                     >
@@ -295,7 +325,16 @@ export default function Header() {
                     </Link>
 
                     <Link
-                      to="/account"
+                      to="/account?tab=cards"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-text-secondary hover:bg-brand-50 hover:text-brand-600 transition-colors text-left font-medium"
+                    >
+                      <CreditCard size={15} className="text-purple-500" />
+                      <span>Cards & Limits</span>
+                    </Link>
+
+                    <Link
+                      to="/account?tab=banking"
                       onClick={() => setAccountOpen(false)}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-text-secondary hover:bg-brand-50 hover:text-brand-600 transition-colors text-left font-medium"
                     >

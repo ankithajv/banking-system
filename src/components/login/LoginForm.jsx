@@ -137,7 +137,7 @@ export default function LoginForm() {
 
       {success && (
         <div className="mb-5 rounded-lg bg-success-50 px-4 py-3 text-center text-sm font-medium text-success-700 border border-success-200">
-          ✓ Login successful! Redirecting to your account…
+          Login successful! Redirecting to your account…
         </div>
       )}
 
